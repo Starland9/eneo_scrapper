@@ -1,11 +1,9 @@
+import time
 from datetime import datetime
-from xmlrpc.client import DateTime
 
 from selenium import webdriver
-from selenium.webdriver.chrome.service import Service as ChromeService
 from selenium.webdriver.common.by import By
-from webdriver_manager.chrome import ChromeDriverManager
-import time
+
 
 class Localite:
     def __init__(self, quater: str, city: str, observations: str, start_date: str, end_date: str):
@@ -28,7 +26,7 @@ class EneoScraper:
         zones = [option.text for option in regions_options]
         return zones
 
-    def search_locality(self, locality, region: str = None) -> list[Localite]:
+    def search_locality(self, locality: str, region: str = None) -> list[Localite]:
         if region:
             regions_select = self.driver.find_element(By.ID, "regions")
             regions_options = regions_select.find_elements(By.TAG_NAME, "option")
@@ -39,7 +37,8 @@ class EneoScraper:
 
 
         search_input = self.driver.find_element(By.ID, "localite")
-        search_input.send_keys(locality)
+        search_input.clear()
+        search_input.send_keys(locality.strip())
         submit_button = self.driver.find_element(By.ID, "submitSaerch")
         submit_button.click()
         time.sleep(1)

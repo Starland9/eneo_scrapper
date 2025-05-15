@@ -1,4 +1,5 @@
-from typing import Union, Optional
+from typing import Union
+
 from fastapi import FastAPI
 from selenium import webdriver
 from selenium.webdriver.chrome.service import Service as ChromeService
@@ -9,7 +10,6 @@ from eneo_scrapper import EneoScraper
 options = webdriver.ChromeOptions()
 options.add_argument("--headless")
 options.add_argument("--no-sandbox")
-options.add_argument("--disable-dev-shm-usage")
 driver = webdriver.Chrome(service=ChromeService(ChromeDriverManager().install()), options=options)
 
 scrapper = EneoScraper(driver)
