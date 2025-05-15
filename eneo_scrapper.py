@@ -17,22 +17,20 @@ class Localite:
 
 
 class EneoScraper:
-    def __init__(self):
+    def __init__(self, driver: webdriver):
         self.eneo_url="https://alert.eneo.cm/"
+        self.driver = driver
+        self.driver.get(self.eneo_url)
 
     def get_regions(self) -> list[str]:
-        driver = self.get_driver()
-        regions_select = driver.find_element(By.ID, "regions")
+        regions_select = self.driver.find_element(By.ID, "regions")
         regions_options = regions_select.find_elements(By.TAG_NAME, "option")
         zones = [option.text for option in regions_options]
-        driver.quit()
         return zones
 
     def search_locality(self, locality, region: str = None) -> list[Localite]:
-        driver = self.get_driver()
-
         if region:
-            regions_select = driver.find_element(By.ID, "regions")
+            regions_select = self.driver.find_element(By.ID, "regions")
             regions_options = regions_select.find_elements(By.TAG_NAME, "option")
             for option in regions_options:
                 if option.text == region:
@@ -40,13 +38,13 @@ class EneoScraper:
                     break
 
 
-        search_input = driver.find_element(By.ID, "localite")
+        search_input = self.driver.find_element(By.ID, "localite")
         search_input.send_keys(locality)
-        submit_button = driver.find_element(By.ID, "submitSaerch")
+        submit_button = self.driver.find_element(By.ID, "submitSaerch")
         submit_button.click()
         time.sleep(1)
 
-        localite_container_div = driver.find_element(By.ID, "contentdata")
+        localite_container_div = self.driver.find_element(By.ID, "contentdata")
 
         localite_divs = localite_container_div.find_elements(By.CLASS_NAME, "outage")
 
@@ -66,25 +64,4 @@ class EneoScraper:
 
             localites.append(Localite(quater, city, observations, start_date, end_date))
 
-        driver.quit()
-
         return localites
-
-    def get_driver(self):
-        options = webdriver.ChromeOptions()
-        options.add_argument("--headless")
-        options.add_argument("--no-sandbox")
-        options.add_argument("--disable-dev-shm-usage")
-        driver = webdriver.Chrome(service=ChromeService(ChromeDriverManager().install()), options=options)
-        driver.get(self.eneo_url)
-        return driver
-
-
-def main():
-    eneo_scrapper = EneoScraper()
-    localites = eneo_scrapper.search_locality("Douala")
-    print(localites)
-
-
-if __name__ == "__main__":
-    main()
